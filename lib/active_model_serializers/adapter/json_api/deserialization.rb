@@ -181,7 +181,8 @@ module ActiveModelSerializers
         def parse_relationship(assoc_name, assoc_data, options)
           prefix_key = field_key(assoc_name, options).to_s.singularize
           hash =
-            if assoc_data.is_a?(Array)
+            if plural_data?(assoc_name, assoc_data)
+              assoc_data ||= []
               { "#{prefix_key}_ids".to_sym => assoc_data.map { |ri| ri['id'] } }
             else
               { "#{prefix_key}_id".to_sym => assoc_data ? assoc_data['id'] : nil }
@@ -193,6 +194,11 @@ module ActiveModelSerializers
           end
 
           hash
+        end
+
+        # @api private
+        def plural_data?(assoc_name, assoc_data)
+          assoc_data.is_a?(Array) || (assoc_data.nil? && (assoc_name.pluralize == assoc_name))
         end
 
         # @api private

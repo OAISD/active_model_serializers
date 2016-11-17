@@ -106,6 +106,38 @@ module ActionController
 
           assert_equal(expected, response)
         end
+
+        def test_deserialization_empty_relationships
+          hash = {
+            'data' => {
+              'type' => 'photos',
+              'id' => 'zorglub',
+              'attributes' => {
+                'title' => 'Ember Hamster'
+              },
+              'relationships' => {
+                'author' => {
+                  'data' => nil
+                },
+                'comments' => {
+                  'data' => nil
+                }
+              }
+            }
+          }
+
+          post :render_parsed_payload, params: hash
+
+          response = JSON.parse(@response.body)
+          expected = {
+            'id' => 'zorglub',
+            'title' => 'Ember Hamster',
+            'author_id' => nil,
+            'comment_ids' => []
+          }
+
+          assert_equal(expected, response)
+        end
       end
     end
   end
